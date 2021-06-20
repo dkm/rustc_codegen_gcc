@@ -1,8 +1,13 @@
 #!/bin/bash
-set -e
+set -ex
 cd $(dirname "$0")
+echo $RUSTUP_HOME
+echo $CARGO_HOME
+which rustup
+##$(rustup which rustc)
 
 SRC_DIR=$(dirname $(rustup which rustc))"/../lib/rustlib/src/rust/"
+echo LA $SRC_DIR
 DST_DIR="sysroot_src"
 
 if [ ! -e $SRC_DIR ]; then
@@ -20,6 +25,13 @@ git init
 echo "[GIT] add"
 git add .
 echo "[GIT] commit"
+
+# This is needed on virgin system where nothing is configured.
+# git really needs something here, or it will fail.
+# Even using --author is not enough.
+git config user.email || git config user.email "none@none.com"
+git config user.name || git config user.name "None"
+
 git commit -m "Initial commit" -q
 for file in $(ls ../../patches/ | grep -v patcha); do
 echo "[GIT] apply" $file
